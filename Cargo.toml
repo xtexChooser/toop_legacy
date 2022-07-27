@@ -1,0 +1,13 @@
+[package]
+name = "toop"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[[bin]]
+name = "toop"
+path = "src/main/rust/main.rs"
+test = false
+doctest = false
+bench = false
