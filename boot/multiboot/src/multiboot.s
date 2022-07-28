@@ -49,7 +49,7 @@ multiboot_header_end:
 
 multiboot_entry:
     // Configure stack
-    movl    end_stack, %esp
+    movl    $end_stack, %esp
 
     // Reset EFLAGS
     pushl   $0

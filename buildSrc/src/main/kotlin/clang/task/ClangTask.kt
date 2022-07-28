@@ -19,29 +19,31 @@ import java.io.File
 
 open class ClangTask : AbstractExecTask<ClangTask>(ClangTask::class.java) {
 
-    @Input
-    val nostdlibProperty = project.objects.property<Boolean>().value(true)
+    private val nostdlibProperty = project.objects.property<Boolean>().value(true)
 
-    @get:Internal
+    @get:Input
     var nostdlib by nostdlibProperty
 
-    @Input
-    val asmOnlyProperty = project.objects.property<Boolean>().value(true)
+    private val asmOnlyProperty = project.objects.property<Boolean>().value(true)
 
-    @get:Internal
+    @get:Input
     var asmOnly by asmOnlyProperty
 
-    @Input
-    @Optional
-    val targetProperty = project.objects.property<String?>().convention(null)
+    private val genPICProperty = project.objects.property<Boolean>().value(true)
 
-    @get:Internal
+    @get:Input
+    var genPIC by genPICProperty
+
+    private val targetProperty = project.objects.property<String?>().convention(null)
+
+    @get:Input
+    @get:Optional
     var target by targetProperty
 
-    @OutputFile
-    val outputProperty = project.objects.property<File>()
+    private val outputProperty = project.objects.property<File>()
+        .convention(project.provider { project.buildDir.resolve(source.singleFile.name + ".o") })
 
-    @get:Internal
+    @get:OutputFile
     var output by outputProperty
 
     @InputFiles
@@ -49,6 +51,9 @@ open class ClangTask : AbstractExecTask<ClangTask>(ClangTask::class.java) {
 
     @InputFiles
     val includes = project.objects.fileCollection()
+
+    @Internal
+    var extraArgs: (() -> Set<String>)? = null
 
     init {
         executable = "clang"
@@ -67,10 +72,14 @@ open class ClangTask : AbstractExecTask<ClangTask>(ClangTask::class.java) {
         if (asmOnly) {
             args("-c")
         }
+        if (genPIC) {
+            args("-fPIC")
+        }
         args("-o", output.absolutePath)
         if (!includes.isEmpty) {
             args("-I", includes.files.map { it.absolutePath }.joinToString(separator = ";"))
         }
+        if (extraArgs != null) args(extraArgs!!())
         args(source.files.map { it.absolutePath })
         super.exec()
     }
@@ -78,5 +87,9 @@ open class ClangTask : AbstractExecTask<ClangTask>(ClangTask::class.java) {
     fun source(configure: ConfigurableFileCollection.() -> Unit) = source.apply(configure)
 
     fun includes(configure: ConfigurableFileCollection.() -> Unit) = includes.apply(configure)
+
+    fun extraArgs(provider: (() -> Set<String>)) {
+        extraArgs = provider
+    }
 
 }
