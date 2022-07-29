@@ -11,7 +11,7 @@ apply<ObjectLinkingPlugin>()
 tasks.getByName<ClangTask>("compileC") {
     target = "i686-pc-unknown-elf"
     source {
-        from("src/multiboot.c")
+        from("src/multiboot2.c")
     }
     inputs.dir(file("../src"))
 }
@@ -19,13 +19,13 @@ tasks.getByName<ClangTask>("compileC") {
 tasks.getByName<ClangTask>("compileAsm") {
     target = "i686-pc-unknown-elf"
     source {
-        from("src/multiboot.S")
+        from("src/multiboot2.S")
     }
     inputs.dir(file("../src"))
 }
 
 tasks.getByName<LdTask>("link") {
-    output = buildDir.resolve("multiboot")
+    output = buildDir.resolve("multiboot2")
     source {
         from(tasks.getByName("compileC"))
         from(tasks.getByName("compileAsm"))
