@@ -2,7 +2,7 @@
 .global start, _start
 .code16
 
-#include "../../loader/src/x86/loader_x86.S"
+#include "../../src/x86/loader_x86.S"
 
 .org 0
 start:
@@ -24,7 +24,6 @@ eltorito_entrypoint:
     mov     %ax, %ss
     mov     %ax, %sp
 
-    // Load the whole ElTorito loader
     mov     %dl, boot_bios_drive_number
 
     // Initialize LBA
@@ -36,7 +35,7 @@ eltorito_entrypoint:
     mov     bi_BootFileLength, %ebx
     shrl    $11, %ebx // ebx /= 2048
 
-    // Read with EDD
+    // Read loader with EDD
     .edd_read:
         // Update sectors count
         mov     %eax, edd_disk_addr_packet_target_LBA

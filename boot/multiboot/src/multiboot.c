@@ -1,4 +1,4 @@
-#include "../../loader/src/loader.h"
+#include "../../src/loader.c"
 #include "multiboot2.h"
 
 void multiboot_entry_c(unsigned long magic, unsigned long *info_tags) {

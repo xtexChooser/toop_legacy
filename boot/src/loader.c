@@ -21,33 +21,34 @@ void load_kernel(void *kernel, int kernel_size) {
     int *move_src = kernel;
     for (int i = 0; i < move_times; i++) {
       *move_dest = *move_src;
-      move_dest += sizeof(int);
-      move_src += sizeof(int);
+      move_dest++;
+      move_src++;
     }
   }
 
-  // Resolve program headers
-  Elf32_Phdr *program_header = (Elf32_Phdr *)kernel_elf->e_phoff;
+  // Resolve LOAD program headers
+  Elf32_Phdr *program_header =
+      (Elf32_Phdr *)(((void *)kernel_elf) + kernel_elf->e_phoff);
   for (int i = 0; i < kernel_elf->e_phnum; i++) {
     if (program_header->p_type == PT_LOAD) {
       int move_times = program_header->p_filesz / sizeof(int);
-      int *move_src = (int *)kernel_elf + program_header->p_offset;
+      int *move_src = (int *)((void *)kernel_elf + program_header->p_offset);
       int *move_dest = (int *)program_header->p_paddr;
       for (int i = 0; i < move_times; i++) {
         *move_dest = *move_src;
-        move_dest += sizeof(int);
-        move_src += sizeof(int);
+        move_dest++;
+        move_src++;
       }
     }
-    program_header += sizeof(Elf32_Phdr);
+    program_header++;
   }
 
   // Call entry point
-  entry_point();
+  __asm__("jmp *%%eax" ::"a"(entry_point));
 }
 
 void *find_elf_load_base_addr(Elf32_Ehdr *elf) {
-  Elf32_Phdr *program_header = (Elf32_Phdr *)elf->e_phoff;
+  Elf32_Phdr *program_header = (Elf32_Phdr *)(((void *)elf) + elf->e_phoff);
   void *load_base_addr = 0;
   for (int i = 0; i < elf->e_phnum; i++) {
     if (program_header->p_type == PT_LOAD) {
@@ -55,23 +56,23 @@ void *find_elf_load_base_addr(Elf32_Ehdr *elf) {
         load_base_addr = (void *)program_header->p_paddr;
       }
     }
-    program_header += sizeof(Elf32_Phdr);
+    program_header++;
   }
   return load_base_addr;
 }
 
 void *find_elf_load_end_addr(Elf32_Ehdr *elf) {
-  Elf32_Phdr *program_header = (Elf32_Phdr *)elf->e_phoff;
+  Elf32_Phdr *program_header = (Elf32_Phdr *)(((void *)elf) + elf->e_phoff);
   void *load_end = 0;
   for (int i = 0; i < elf->e_phnum; i++) {
     if (program_header->p_type == PT_LOAD) {
-      Elf32_Addr cur_load_end =
-          program_header->p_paddr + program_header->p_memsz;
-      if ((void *)cur_load_end > load_end) {
-        load_end = (void *)cur_load_end;
+      void *cur_load_end = (void *)(((int)program_header->p_paddr) +
+                                    (int)program_header->p_memsz);
+      if (cur_load_end > load_end) {
+        load_end = cur_load_end;
       }
     }
-    program_header += sizeof(Elf32_Phdr);
+    program_header++;
   }
   return load_end;
 }

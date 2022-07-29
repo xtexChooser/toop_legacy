@@ -14,9 +14,9 @@ gdtr:
     .long gdt // base
 .endm
 
-#define load_init_gdtr lgdt gdtr
-#define DATA_SEG_SELECTOR $0b10000
-#define CODE_SEG_SELECTOR $0b01000
+#define load_init_gdtr      lgdt gdtr
+#define DATA_SEG_SELECTOR   $0b10000
+#define CODE_SEG_SELECTOR   $0b01000
 
 .macro switch_data_segs
     mov     DATA_SEG_SELECTOR, %ax

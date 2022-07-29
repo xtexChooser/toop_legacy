@@ -1,2 +1,3 @@
 rootProject.name = "toop"
-include("boot:loader", "boot:multiboot", "boot:eltorito")
+include("boot:multiboot", "boot:eltorito")
+include("test")

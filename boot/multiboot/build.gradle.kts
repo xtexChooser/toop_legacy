@@ -13,6 +13,7 @@ tasks.getByName<ClangTask>("compileC") {
     source {
         from("src/multiboot.c")
     }
+    inputs.dir(file("../src"))
 }
 
 tasks.getByName<ClangTask>("compileAsm") {
@@ -20,14 +21,13 @@ tasks.getByName<ClangTask>("compileAsm") {
     source {
         from("src/multiboot.S")
     }
+    inputs.dir(file("../src"))
 }
 
-evaluationDependsOn(":boot:loader")
 tasks.getByName<LdTask>("link") {
     output = buildDir.resolve("multiboot")
     source {
         from(tasks.getByName("compileC"))
         from(tasks.getByName("compileAsm"))
-        from(project(":boot:loader").tasks.getByName("compileC"))
     }
 }

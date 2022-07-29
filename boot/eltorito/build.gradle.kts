@@ -16,7 +16,7 @@ tasks.getByName<ClangTask>("compileC") {
     source {
         from("src/eltorito.c")
     }
-    inputs.dir(file("../loader/src/x86"))
+    inputs.dir(file("../src"))
 }
 
 tasks.getByName<ClangTask>("compileAsm") {
@@ -24,17 +24,12 @@ tasks.getByName<ClangTask>("compileAsm") {
     source {
         from("src/eltorito.S")
     }
+    inputs.dir(file("../src"))
 }
 
-evaluationDependsOn(":boot:loader")
 tasks.getByName<LdTask>("link") {
     output = buildDir.resolve("eltorito")
     textSectionBase = "0x7c00"
-    val loaderCompileC = project(":boot:loader").tasks.getByName("compileC")
-    dependsOn(loaderCompileC)
-    source {
-        from(loaderCompileC)
-    }
 }
 
 tasks.getByName<ObjcopyTask>("objcopy") {
