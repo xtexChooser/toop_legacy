@@ -39,4 +39,5 @@ tasks.create<Exec>("runIsoQemu") {
     argumentProviders.add { listOf("-cdrom", mkiso.outputs.files.singleFile.absolutePath) }
     argumentProviders.add { listOf("-serial", "vc") }
     argumentProviders.add { listOf("-s") }
+    argumentProviders.add { listOf("-device", "isa-debug-exit,iobase=0xf4,iosize=0x04") }
 }
