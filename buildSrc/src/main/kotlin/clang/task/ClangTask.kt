@@ -19,11 +19,6 @@ open class ClangTask : AbstractExecTask<ClangTask>(ClangTask::class.java) {
     @get:Input
     var asmOnly by asmOnlyProperty
 
-    private val genPICProperty = project.objects.property<Boolean>().value(true)
-
-    @get:Input
-    var genPIC by genPICProperty
-
     private val targetProperty = project.objects.property<String?>().convention(null)
 
     @get:Input
@@ -52,7 +47,6 @@ open class ClangTask : AbstractExecTask<ClangTask>(ClangTask::class.java) {
         }
         argumentProviders.add { if (targetProperty.isPresent) listOf("-target", target) else emptyList() }
         argumentProviders.add { if (asmOnly) listOf("-c") else emptyList() }
-        argumentProviders.add { if (genPIC) listOf("-fPIC") else emptyList() }
         argumentProviders.add { listOf("-o", output.absolutePath) }
         argumentProviders.add {
             if (!includes.isEmpty) listOf(
