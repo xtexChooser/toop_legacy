@@ -3,7 +3,7 @@ import toop.build.gradle.iso.task.XorrisoTask
 
 apply<IsoPlugin>()
 
-val mergeElToritoLoader = tasks.create("mergeElToritoLoader") {
+/*val mergeElToritoLoader = tasks.create("mergeElToritoLoader") {
     val loaderObjcopy = evaluationDependsOn(":boot:eltorito").tasks.getByName("objcopy")
     val kernelCompileRs = evaluationDependsOn(":").tasks.getByName("compileRust")
     dependsOn(loaderObjcopy, kernelCompileRs)
@@ -40,4 +40,4 @@ tasks.create<Exec>("runIsoQemu") {
     argumentProviders.add { listOf("-serial", "vc") }
     argumentProviders.add { listOf("-s") }
     argumentProviders.add { listOf("-device", "isa-debug-exit,iobase=0xf4,iosize=0x04") }
-}
+}*/

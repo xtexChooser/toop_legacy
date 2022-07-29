@@ -26,26 +26,32 @@ eltorito_entrypoint:
 
     mov     %dl, boot_bios_drive_number
 
+    // eax: reading location
+    // ebx: remaining length
+    // ecx: buffer offset
+    // edx: current reading length
+
     // Initialize LBA
     movl    bi_BootFileLocation, %eax
     incl    %eax
-    // Initailize buffer offset
-    movw    $0x8400, edd_disk_addr_packet_buffer_offset
     // Initialize target sectors count
     mov     bi_BootFileLength, %ebx
     shrl    $11, %ebx // ebx /= 2048
+    // Initailize buffer offset
+    mov     $0x8400, %ecx
 
     // Read loader with EDD
     .edd_read:
-        // Update sectors count
+        // Update DAP
         mov     %eax, edd_disk_addr_packet_target_LBA
-        mov     %ebx, %ecx
-        cmp     $0x7f, %ecx
+        mov     %cx, edd_disk_addr_packet_buffer_offset
+        mov     %ebx, %edx
+        cmp     $0x7f, %edx
         jle     .edd_read_call
-        mov     $0x7f, %ecx
+        mov     $0x7f, %edx
     .edd_read_call:
+        movb    %dl, edd_disk_addr_packet_sectors_count
         // Call read
-        movb    %cl, edd_disk_addr_packet_sectors_count
         pusha
         mov     $0x42, %ah
         mov     $edd_disk_addr_packet, %si
@@ -54,8 +60,10 @@ eltorito_entrypoint:
         popa
         jc      .edd_read
         // Initialize next read
-        subl    %ecx, %ebx
-        addl    %ecx, %eax
+        addl    %edx, %eax
+        subl    %edx, %ebx
+        shl     $11, %edx
+        addl    %edx, %ecx
         cmp     $0, %ebx
         jnz     .edd_read
 
