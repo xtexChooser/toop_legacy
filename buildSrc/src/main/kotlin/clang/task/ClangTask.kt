@@ -1,17 +1,7 @@
 package toop.build.gradle.clang.task
 
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.AbstractExecTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.OutputFiles
-import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.setValue
@@ -52,44 +42,29 @@ open class ClangTask : AbstractExecTask<ClangTask>(ClangTask::class.java) {
     @InputFiles
     val includes = project.objects.fileCollection()
 
-    @Internal
-    var extraArgs: (() -> Set<String>)? = null
-
     init {
         executable = "clang"
         workingDir = project.file("src")
-    }
-
-    @TaskAction
-    override fun exec() {
-        setArgs(emptyList())
-        if (nostdlib) {
-            args("-nostdlib", "-nostdinc", "-fno-builtin", "-fno-stack-protector")
+        argumentProviders.add {
+            if (nostdlib)
+                listOf("-nostdlib", "-nostdinc", "-fno-builtin", "-fno-stack-protector")
+            else emptyList()
         }
-        if (targetProperty.isPresent) {
-            args("-target", target)
+        argumentProviders.add { if (targetProperty.isPresent) listOf("-target", target) else emptyList() }
+        argumentProviders.add { if (asmOnly) listOf("-c") else emptyList() }
+        argumentProviders.add { if (genPIC) listOf("-fPIC") else emptyList() }
+        argumentProviders.add { listOf("-o", output.absolutePath) }
+        argumentProviders.add {
+            if (!includes.isEmpty) listOf(
+                "-I",
+                includes.files.map { it.absolutePath }.joinToString(separator = ";")
+            ) else emptyList()
         }
-        if (asmOnly) {
-            args("-c")
-        }
-        if (genPIC) {
-            args("-fPIC")
-        }
-        args("-o", output.absolutePath)
-        if (!includes.isEmpty) {
-            args("-I", includes.files.map { it.absolutePath }.joinToString(separator = ";"))
-        }
-        if (extraArgs != null) args(extraArgs!!())
-        args(source.files.map { it.absolutePath })
-        super.exec()
+        argumentProviders.add { source.files.map { it.absolutePath } }
     }
 
     fun source(configure: ConfigurableFileCollection.() -> Unit) = source.apply(configure)
 
     fun includes(configure: ConfigurableFileCollection.() -> Unit) = includes.apply(configure)
-
-    fun extraArgs(provider: (() -> Set<String>)) {
-        extraArgs = provider
-    }
 
 }

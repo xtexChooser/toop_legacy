@@ -46,51 +46,30 @@ open class LdTask : AbstractExecTask<LdTask>(LdTask::class.java) {
     @get:Internal
     var textSectionBase by textSectionBaseProperty
 
-    @Internal
-    var extraArgs: (() -> Set<String>)? = null
-
     init {
         executable = "ld.lld" + OperatingSystem.current().executableSuffix
-        if(project.tasks.findByName("compileC") != null) {
+        if (project.tasks.findByName("compileC") != null) {
             val task = project.tasks.getByName("compileC")
             dependsOn(task)
             source.from(task)
         }
-        if(project.tasks.findByName("compileAsm") != null) {
+        if (project.tasks.findByName("compileAsm") != null) {
             val task = project.tasks.getByName("compileAsm")
             dependsOn(task)
             source.from(task)
         }
-    }
-
-    @TaskAction
-    override fun exec() {
-        setArgs(emptyList())
-        if (entrySymbolProperty.isPresent) {
-            args("--entry", entrySymbol)
+        argumentProviders.add { if (entrySymbolProperty.isPresent) listOf("--entry", entrySymbol) else emptyList() }
+        argumentProviders.add { if (imageBaseProperty.isPresent) listOf("--image-base=$imageBase") else emptyList() }
+        argumentProviders.add { if (textSectionBaseProperty.isPresent) listOf("-Ttext=$textSectionBase") else emptyList() }
+        argumentProviders.add { if (strip) listOf("-s") else emptyList() }
+        argumentProviders.add {
+            if (project.file("linker.ld").exists())
+                listOf("-T${project.file("linker.ld").absolutePath}") else emptyList()
         }
-        if (imageBaseProperty.isPresent) {
-            args("--image-base=$imageBase")
-        }
-        if (textSectionBaseProperty.isPresent) {
-            args("-Ttext=$textSectionBase")
-        }
-        if (strip) {
-            args("-s")
-        }
-        args("-o", output.absolutePath)
-        if (project.file("linker.ld").exists()) {
-            args("-T${project.file("linker.ld").absolutePath}")
-        }
-        if (extraArgs != null) args(extraArgs!!())
-        args(source.files.map { it.absolutePath })
-        super.exec()
+        argumentProviders.add { listOf("-o", output.absolutePath) }
+        argumentProviders.add { source.files.map { it.absolutePath } }
     }
 
     fun source(configure: ConfigurableFileCollection.() -> Unit) = source.apply(configure)
-
-    fun extraArgs(provider: (() -> Set<String>)) {
-        extraArgs = provider
-    }
 
 }

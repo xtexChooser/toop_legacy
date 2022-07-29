@@ -1,7 +1,6 @@
 package toop.build.gradle.clang.task
 
 import org.gradle.api.tasks.*
-import org.gradle.internal.os.OperatingSystem
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.setValue
@@ -41,36 +40,16 @@ open class ObjcopyTask : AbstractExecTask<ObjcopyTask>(ObjcopyTask::class.java) 
     @get:Internal
     var targetSection by targetSectionProperty
 
-    @Internal
-    var extraArgs: (() -> Set<String>)? = null
-
     init {
         executable = "llvm-objcopy"
         project.afterEvaluate {
             inputs.file(input)
             outputs.file(output)
         }
-    }
-
-    @TaskAction
-    override fun exec() {
-        setArgs(emptyList())
-        if(outputFormatProperty.isPresent) {
-            args("-O", outputFormat)
-        }
-        if(targetSectionProperty.isPresent) {
-            args("-j", targetSection)
-        }
-        if (strip) {
-            args("--strip-all")
-        }
-        if (extraArgs != null) args(extraArgs!!())
-        args(input.absolutePath, output.absolutePath)
-        super.exec()
-    }
-
-    fun extraArgs(provider: (() -> Set<String>)) {
-        extraArgs = provider
+        argumentProviders.add { if (outputFormatProperty.isPresent) listOf("-O", outputFormat) else emptyList() }
+        argumentProviders.add { if (targetSectionProperty.isPresent) listOf("-j", targetSection) else emptyList() }
+        argumentProviders.add { if (strip) listOf("--strip-all") else emptyList() }
+        argumentProviders.add { listOf(input.absolutePath, output.absolutePath) }
     }
 
 }
