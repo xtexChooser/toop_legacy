@@ -6,6 +6,7 @@ open class CargoTask : AbstractExecTask<CargoTask>(CargoTask::class.java) {
 
     init {
         executable = "cargo"
+        errorOutput = System.out
     }
 
 }

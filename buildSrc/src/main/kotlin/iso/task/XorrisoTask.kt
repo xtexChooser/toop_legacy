@@ -40,6 +40,7 @@ open class XorrisoTask : AbstractExecTask<XorrisoTask>(XorrisoTask::class.java) 
     init {
         executable = "xorriso"
         workingDir = project.buildDir
+        errorOutput = System.out
         argumentProviders.add { listOf("-outdev", output.absolutePath) }
         argumentProviders.add { listOf("-charset", "utf-8") }
         argumentProviders.add { if (volumeIDProperty.isPresent) listOf("-volid", volumeID) else emptySet() }
