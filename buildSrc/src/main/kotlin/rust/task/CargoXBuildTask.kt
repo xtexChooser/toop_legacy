@@ -11,7 +11,7 @@ open class CargoXBuildTask : CargoTask() {
         argumentProviders.add { listOf("--target", project.extensions.getByType<RustExtension>().target) }
         inputs.dir(project.file("src/main/rust"))
         inputs.file(project.file("Cargo.toml"))
-        outputs.dir(File(project.buildDir, "rs"))
+        outputs.dir(project.file("target"))
     }
 
 }

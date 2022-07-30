@@ -20,7 +20,7 @@ dependencies {
 }
 
 tasks.getByName<Jar>("jar") {
-    archiveVersion.set(null as String?)
+    archiveVersion.convention(null as String?)
 }
 
 tasks.getByName<CargoXBuildTask>("compileRust") {

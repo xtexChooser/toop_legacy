@@ -1,5 +1,5 @@
 [build]
-target-dir = "build/rs"
+# target-dir = "build/rs"
 rustflags = [
     "-C", "link-args=-nostartfiles --entry _start --Ttext=0x00100000"
 ]
