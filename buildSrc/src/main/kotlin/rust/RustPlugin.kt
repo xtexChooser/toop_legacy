@@ -8,7 +8,7 @@ import toop.build.gradle.rust.task.CargoXBuildTask
 class RustPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
-        target.extensions.create("rust", RustExtension::class)
+        target.extensions.create("rust", RustExtension::class, target)
         val compileRust = target.tasks.create("compileRust", CargoXBuildTask::class)
         target.tasks.maybeCreate("build").dependsOn(compileRust)
     }

@@ -1,11 +1,10 @@
 [package]
 name = "toop"
-version = "0.1.0"
-edition = "2021"
+version = "0.0.0"
 
 [[bin]]
 name = "toop"
-path = "src/main/rust/main.rs"
+path = "src/main/rust/mod.rs"
 test = false
 doctest = false
 bench = false

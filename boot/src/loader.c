@@ -1,6 +1,9 @@
 #include "loader.h"
 
-void load_kernel(void *kernel, int kernel_size) {
+void load_kernel(struct boot_info *boot_info) {
+  void *kernel = (void *)boot_info->kernel_base;
+  void *kernel_end = (void *)boot_info->kernel_end;
+  int kernel_size = (int)(kernel_end - kernel);
   Elf32_Ehdr *kernel_elf = (Elf32_Ehdr *)kernel;
   kernel_entry entry_point = (kernel_entry)kernel_elf->e_entry;
 
@@ -9,7 +12,6 @@ void load_kernel(void *kernel, int kernel_size) {
   void *load_end = find_elf_load_end_addr(kernel_elf);
 
   // Move ELF
-  void *kernel_end = kernel + kernel_size;
   if ((kernel >= load_base_addr && kernel <= load_end) ||
       (kernel_end >= load_base_addr && kernel_end <= load_end) ||
       (kernel <= load_base_addr && kernel_end >= load_end)) {
@@ -17,6 +19,7 @@ void load_kernel(void *kernel, int kernel_size) {
     int *move_dest = load_end;
     if (kernel_end > load_end)
       move_dest = kernel_end;
+    move_dest++;
     kernel_elf = (Elf32_Ehdr *)move_dest;
     int *move_src = kernel;
     for (int i = 0; i < move_times; i++) {
@@ -44,7 +47,9 @@ void load_kernel(void *kernel, int kernel_size) {
   }
 
   // Call entry point
-  __asm__("jmp *%%eax" ::"a"(entry_point));
+  boot_info->kernel_base = (int)kernel_elf;
+  boot_info->kernel_end = (int)load_end;
+  entry_point(boot_info);
 }
 
 void *find_elf_load_base_addr(Elf32_Ehdr *elf) {

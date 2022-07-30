@@ -1,7 +1,10 @@
 package toop.build.gradle.rust
 
-open class RustExtension {
+import org.gradle.api.Project
 
-    var target = "src/main/rstargets/x86-toop.json"
+open class RustExtension(val project: Project) {
+
+    var target = "x86-toop"
+    val targetPath get() = project.rootProject.file("src/main/rstargets/$target.json").absolutePath
 
 }
