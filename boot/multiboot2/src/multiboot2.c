@@ -16,5 +16,5 @@ void multiboot_entry_c(unsigned long magic, unsigned long *info_tags) {
     tag += (tag->size + 7) & ~7;
   }
   load_kernel((void *)kernel_module->mod_start,
-              (kernel_module->mod_start - kernel_module->mod_end));
+              (kernel_module->mod_end - kernel_module->mod_start));
 }

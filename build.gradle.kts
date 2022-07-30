@@ -1,4 +1,5 @@
 import toop.build.gradle.rust.RustPlugin
+import toop.build.gradle.rust.task.CargoXBuildTask
 
 plugins {
     id("java")
@@ -16,4 +17,12 @@ allprojects {
 }
 
 dependencies {
+}
+
+tasks.getByName<Jar>("jar") {
+    archiveVersion.set(null as String?)
+}
+
+tasks.getByName<CargoXBuildTask>("compileRust") {
+    dependsOn(tasks.getByName("jar"))
 }
