@@ -29,6 +29,7 @@ void multiboot_entry_c(unsigned long magic,
     if (mmap->type != MULTIBOOT_MEMORY_AVAILABLE) {
       boot_info.mem_reserved_map_size++;
       mem_reserved_map++;
+      // @TODO: see QEMU#1131 https://gitlab.com/qemu-project/qemu/-/issues/1131
       volatile unsigned long long addr = mmap->addr;
       mem_reserved_map->base_addr = addr;
       volatile unsigned long long len = mmap->len;
