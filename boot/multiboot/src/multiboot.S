@@ -43,7 +43,7 @@ multiboot_header:
 
 multiboot_entry:
     // Configure stack
-    movl    $0x7c00, %esp
+    movl    $0x7000, %esp
 
     // Reset EFLAGS
     pushl   $0

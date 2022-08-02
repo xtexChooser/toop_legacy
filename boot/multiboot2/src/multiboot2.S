@@ -46,6 +46,7 @@ multiboot_info_request_tag:
     .short  MULTIBOOT_HEADER_TAG_OPTIONAL
     .long   multiboot_info_request_tag - multiboot_info_request_tag_end
     .long   MULTIBOOT_TAG_TYPE_MMAP
+    .long   MULTIBOOT_TAG_TYPE_BASIC_MEMINFO
 multiboot_info_request_tag_end:
 
 .short  MULTIBOOT_HEADER_TAG_END

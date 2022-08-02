@@ -1,4 +1,4 @@
 {
     "rust-analyzer.checkOnSave.allTargets": false,
-    "rust-analyzer.cargo.target": "src/main/rstargets/x86-toop.json"
+    "rust-analyzer.cargo.target": "src/main/rstargets/x86.json"
 }

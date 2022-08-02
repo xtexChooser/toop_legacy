@@ -29,7 +29,8 @@ void multiboot_entry_c(unsigned long magic, unsigned long *info_tags) {
         if (mmap_entry->type != MULTIBOOT_MEMORY_AVAILABLE) {
           boot_info.mem_reserved_map_size++;
           mem_reserved_map++;
-          // @TODO: see QEMU#1131 https://gitlab.com/qemu-project/qemu/-/issues/1131
+          // @TODO: see QEMU#1131
+          // https://gitlab.com/qemu-project/qemu/-/issues/1131
           volatile unsigned long long addr = mmap_entry->addr;
           mem_reserved_map->base_addr = addr;
           volatile unsigned long long len = mmap_entry->len;
@@ -38,6 +39,13 @@ void multiboot_entry_c(unsigned long magic, unsigned long *info_tags) {
         mmap_entry =
             (multiboot_memory_map_t *)(((void *)mmap_entry) + mmap->entry_size);
       }
+      break;
+    }
+    case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO: {
+      struct multiboot_tag_basic_meminfo *mem_info =
+          (struct multiboot_tag_basic_meminfo *)tag;
+      boot_info.mem_lower = mem_info->mem_lower;
+      boot_info.mem_upper = mem_info->mem_upper + 1024;
       break;
     }
     }

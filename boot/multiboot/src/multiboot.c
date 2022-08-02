@@ -3,6 +3,10 @@
 
 void multiboot_entry_c(unsigned long magic,
                        struct multiboot_info *multiboot_info) {
+  if ((multiboot_info->flags & MULTIBOOT_INFO_MEMORY) == 0) {
+    while (1)
+      ; // @TODO: Missing memory info
+  }
   if ((multiboot_info->flags & MULTIBOOT_INFO_MEM_MAP) == 0) {
     while (1)
       ; // @TODO: Missing memory map
@@ -13,6 +17,8 @@ void multiboot_entry_c(unsigned long magic,
   struct boot_info boot_info;
   boot_info.kernel_base = kernel_module->mod_start;
   boot_info.kernel_end = kernel_module->mod_end;
+  boot_info.mem_lower = multiboot_info->mem_lower;
+  boot_info.mem_upper = multiboot_info->mem_upper + 1024;
 
   boot_info.mem_reserved_map_size = 0;
 

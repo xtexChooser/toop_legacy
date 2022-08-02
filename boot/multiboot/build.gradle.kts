@@ -26,6 +26,7 @@ tasks.getByName<ClangTask>("compileAsm") {
 
 tasks.getByName<LdTask>("link") {
     output = buildDir.resolve("multiboot")
+    imageBase = "0x7000"
     source {
         from(tasks.getByName("compileC"))
         from(tasks.getByName("compileAsm"))

@@ -14,7 +14,7 @@ val mergeElToritoLoader = tasks.create("mergeElToritoLoader") {
     doLast {
         output.outputStream().use { out ->
             loaderObjcopy.outputs.files.singleFile.inputStream().use { it.copyTo(out) }
-            rootProject.file("build/rs/x86-toop/debug/toop").inputStream().use { it.copyTo(out) }
+            rootProject.file("build/rs/x86/debug/toop").inputStream().use { it.copyTo(out) }
         }
     }
 }
@@ -49,8 +49,9 @@ tasks.create<Exec>("runMultibootQemu") {
     inputs.files(multiboot.outputs.files, kernel.outputs.files)
     executable("qemu-system-i386")
     argumentProviders.add { listOf("-kernel", multiboot.outputs.files.singleFile.absolutePath) }
-    argumentProviders.add { listOf("-initrd", rootProject.file("target/x86-toop/debug/toop").absolutePath) }
+    argumentProviders.add { listOf("-initrd", rootProject.file("target/x86/debug/toop").absolutePath) }
     argumentProviders.add { listOf("-serial", "vc") }
     argumentProviders.add { listOf("-s") }
+    argumentProviders.add { listOf("-m", "512M") }
     argumentProviders.add { listOf("-device", "isa-debug-exit,iobase=0xf4,iosize=0x04") }
 }

@@ -1,16 +1,18 @@
 #pragma once
 #include "libelf.h"
 
-struct __attribute__((__packed__)) boot_reserved_mmap {
+struct boot_reserved_mmap {
   unsigned long long base_addr;
   unsigned long long size;
 };
 
-struct __attribute__((__packed__)) boot_info {
-  int kernel_base;
-  int kernel_end;
+struct boot_info {
+  unsigned int kernel_base;
+  unsigned int kernel_end;
+  unsigned long long mem_lower;
+  unsigned long long mem_upper;
   struct boot_reserved_mmap *mem_reserved_map;
-  int mem_reserved_map_size;
+  unsigned int mem_reserved_map_size;
 };
 
 typedef void (*kernel_entry)(struct boot_info *boot_info);
